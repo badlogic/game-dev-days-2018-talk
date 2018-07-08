@@ -1,0 +1,72 @@
+*******************************************************************************
+*
+* QuickBasic-Compiler V4.5 Englische Version
+* ============================================================================
+*
+* (c) Thomas Antoni, 9.4.2000 - 6.11.2002
+*       Mailto:thomas@antonis.de
+*       www.antonis.de  --- www.qbasic.de
+*
+*       ---=== Hottest QBasic Stuff On Earth ===---
+*
+*******************************************************************************
+
+Hinweise:
+=========
+
++-------------------------------------------
+| Vorteile von QuickBasic gegenüber QBasic
++-------------------------------------------
+- Echter Compiler, kann EXE-Dateien erzeugen
+- Modulare Programmierung moeglich:  Mehrere getrennt kompilierte Module koennen
+  zusammengebunden werden
+- In getrennte Dateien vorliegende Quellspracheprogrammstuecke koennen per
+  INCLUDE eingefuegt werden
+- Es gibt etwas mehr Befehle, z.B. CALL INTERRUPT
+- Die Speichergrenzen liegen höher
+- QuickBasic ist trotzdem 100%ig kompatibel mit QBasic
+
+
++-------------------------------------------
+| So erstellen Sie eine EXE-Datei
++-------------------------------------------
+
+- Erstellen einer EXE-Datei aus einer BAS-Datei:
+    - QB.EXE starten
+    - <Datei | Programm laden>
+    - <Ausführen | EXE-Datei erstellen ... |  (.) Selbständige EXE-Datei 
+        EXE erstellen und beenden>
+    - Die .EXE-Datei wird im QB 4.5 Verzeichnis angelegt
+    - Die gleichnamige .OBJ-Datei kann ohne Bedenken gelöscht werden
+
+
++-------------------------------------------
+| So vermeiden Sie Fehler bei CALL ABSOLUTE
++-------------------------------------------
+
+- Zum Laden von Programmen, die den Befehl CALL ABSOLUTE oder CALL INTERRUPT
+  enthalten muss die QuickLibrary QLB.LIB mit eingebunden werden. Dies ist
+  z.B. bei den meisten Programmen der Fall, die die Maus verwenden.
+  
+  Zum Einbinden der QLB gibt es die folgenden Alternativen:
+   (1) Starten Sie die QuickBasic-Entwicklungsumgebung über einen der folgenden
+       Kommandozeilen-Aufrufe:
+          QB /L meinprog.bas
+          QB /L QB
+          Qb.exe /L qb.qlb /run beispiel.bas
+
+   (2) Konfigurieren Sie QB.exe unter Windows im "Eigenschaftendialog" wie folgt:
+          . Klicken Sie mit der rechten Maustaste auf QB.exe,
+             um den Eigenschaftendialog zu öffnen
+          . Fügen Sie den Aufrufparameter "/L" ein durch
+             <"Eigenschaften -> Programm -> Befehlszeile = QB.exe /L">
+
+   (3) Starten Sie QB.EXE mit Hilfe der beiliegenden Batch-Datei QB45.BAT
+       Diese hat den folgenden Inhalt:
+          qb.exe /L /H %1
+             oder
+          qb.exe /L /H
+          
+       /H startet übrigens die QuickBasic-Umgebung in der VGA-Auflösung mit
+       50 statt 25 Zeilen. Da ist das Arbeiten doch gleich viel angenehmer.
+

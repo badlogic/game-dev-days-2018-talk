@@ -1,0 +1,30 @@
+
+
+                        RETURN TO MARCHFELD
+                            Sourcecode
+
+                        von Mario Zechner
+
+
+Die Sourcecodes in diesem Verzeichnis wurden mit QuickBasic 4.5 erstellt.
+
+Ledit2.Bas ist der Sourcecode fÅr den Leveleditor dessen Exe-Datei sich im
+Verzeichnis "levels" befindet. Probieren sie ihn nicht aus. Sie werden in
+nicht bedienen kînnen. Er ist auf meine BedÅrfnisse zugeschnitten
+
+rtm.Bas ist der Sourcecode fÅr das Hauptprogramm. Ich habe ihn leider nicht
+kommentiert, die Namen der Sub-Routinen mÅ·ten aber Aufschlu· Åber ihre
+Aufgabe geben. Wollen sie die Datei in der IDE von QBasic ausfÅhren mÅssen
+sie beim Start die Bibliothek d3d.qlb einbinden:
+
+qb rtm /l d3d
+
+Das selbe gilt fÅr den Editor-Sourcecode.
+
+Der $INCLUDE-Befehl fÅgt die Definitionen aller Routinen der DIRECTQB-lib
+sowie meiner ASM-Routine ein. Diese Definitionen finden sie in der Datei
+"Directqb.bi" in diesem Verzeichnis.
+
+Die Assembler-Routine in der Datei COPYMEM.ASM folgt den Microsoft Macro-
+assembler Syntax-Konventionen. Sie dient dazu Speicherblîcke zu kopieren.
+Leider nicht optimiert (32-bit Code etc.)
