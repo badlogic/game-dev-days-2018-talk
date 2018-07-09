@@ -197,6 +197,7 @@ DO
    DQBline 1, 161, 100, 165, 100, 14
    DQBline 1, 160, 95, 160, 99, 14
    DQBline 1, 160, 101, 160, 105, 14
+   dqbprint 1, STR$(alpha%), 0, 0, 1
    REM IF frame THEN DO: LOOP UNTIL DQBframeReady
    IF map% THEN Drawmap
    DQBcopyLayer 1, VIDEO
@@ -330,94 +331,44 @@ IF rpoly(index).z1 <= 0 AND rpoly(index).z2 <= 0 AND rpoly(index).z3 <= 0 AND rp
 END FUNCTION
 
 FUNCTION Collision%
-DIM c1 AS INTEGER
-DIM c2 AS INTEGER
-DIM c3 AS INTEGER
-DIM c4 AS INTEGER
-DIM c5 AS INTEGER
+DIM x AS INTEGER
+DIM y AS INTEGER
+DIM cx AS INTEGER
+DIM cy AS INTEGER
+DIM dx AS INTEGER
+DIM dy AS INTEGER
 
-   x = cam.x \ 16
-   y = cam.z \ 16
-   FOR t = -crad TO crad
-       c1 = DQBpoint(COLLISIONLAYER, x + t, y - crad)
+DIM c1 AS INTEGER
+
+x = cam.x \ 16
+y = cam.z \ 16
+
+dx = 0
+dy = 0
+
+FOR cy = y - 1 TO y + 1
+   FOR cx = x - 1 TO x + 1
+       c1 = DQBpoint(COLLISIONLAYER, cx, cy)
+      
        SELECT CASE c1
          CASE 1:
             Collision% = 1
             EXIT FUNCTION
          CASE 2:
-            EraseITEM x + t, y - crad, c1
+            EraseITEM cx, cy, c1
          CASE 3:
-            EraseITEM x + t, y - crad, c1
+            EraseITEM cx, cy, c1
          CASE 4:
-            EraseITEM x + t, y - crad, c1
+            EraseITEM cx, cy, c1
          CASE 50 TO 70:
             Collision% = 1
             EXIT FUNCTION
        END SELECT
-
-       c2 = DQBpoint(COLLISIONLAYER, x + t, y + crad)
-       SELECT CASE c2
-         CASE 1:
-            Collision% = 1
-            EXIT FUNCTION
-         CASE 2:
-            EraseITEM x + t, y + crad, c2
-         CASE 3:
-            EraseITEM x + t, y + crad, c2
-         CASE 4:
-            EraseITEM x + t, y + crad, c2
-         CASE 50 TO 70:
-            Collision% = 1
-            EXIT FUNCTION
-       END SELECT
-
-       c3 = DQBpoint(COLLISIONLAYER, x - crad, y + t)
-       SELECT CASE c3
-         CASE 1:
-            Collision% = 1
-            EXIT FUNCTION
-         CASE 2:
-            EraseITEM x - crad, y + t, c3
-         CASE 3:
-            EraseITEM x - crad, y + t, c3
-         CASE 4:
-            EraseITEM x - crad, y + t, c3
-         CASE 50 TO 70:
-            Collision% = 1
-            EXIT FUNCTION
-       END SELECT
-
-       c4 = DQBpoint(COLLISIONLAYER, x + crad, y + t)
-       SELECT CASE c4
-         CASE 1:
-            Collision% = 1
-            EXIT FUNCTION
-         CASE 2:
-            EraseITEM x + crad, y + t, c4
-         CASE 3:
-            EraseITEM x + crad, y + t, c4
-         CASE 4:
-            EraseITEM x + crad, y + t, c4
-         CASE 50 TO 70:
-            Collision% = 1
-            EXIT FUNCTION
-       END SELECT
-   NEXT t
-   c5 = DQBpoint(COLLISIONLAYER, cam.x \ 16, cam.z \ 16)
-       SELECT CASE c5
-         CASE 1:
-            Collision% = 1
-            EXIT FUNCTION
-         CASE 2:
-            EraseITEM cam.x \ 16, cam.z \ 16, c5
-         CASE 3:
-            EraseITEM cam.x \ 16, cam.z \ 16, c5
-         CASE 4:
-            EraseITEM cam.x \ 16, cam.z \ 16, c5
-         CASE 50 TO 70:
-            Collision% = 1
-            EXIT FUNCTION
-       END SELECT
+       dx = dx + 8
+   NEXT
+   dx = 0
+   dy = dy + 8
+NEXT
 END FUNCTION
 
 SUB dead
@@ -434,17 +385,17 @@ x = 24
 DO
    IF DQBkey%(KEYDOWN) THEN
       DO: LOOP UNTIL NOT DQBkey%(KEYDOWN)
-      DQBprint VIDEO, ">", x, y, 15
+      dqbprint VIDEO, ">", x, y, 15
       y = y + 20
       IF y > 56 THEN y = 16
-      DQBprint VIDEO, ">", x, y, 107
+      dqbprint VIDEO, ">", x, y, 107
    END IF
    IF DQBkey%(KEYUP) THEN
       DO: LOOP UNTIL NOT DQBkey%(KEYUP)
-      DQBprint VIDEO, ">", x, y, 15
+      dqbprint VIDEO, ">", x, y, 15
       y = y - 20
       IF y < 16 THEN y = 56
-      DQBprint VIDEO, ">", x, y, 107
+      dqbprint VIDEO, ">", x, y, 107
    END IF
    IF DQBkey%(KEYENTER) THEN
       DO: LOOP UNTIL NOT DQBkey%(KEYENTER)
@@ -467,7 +418,7 @@ DO
          SYSTEM
       END IF
    END IF
-   DQBprint VIDEO, ">", x, y, 107
+   dqbprint VIDEO, ">", x, y, 107
 LOOP
 
 
@@ -521,7 +472,7 @@ SUB DoENEMS
       wall(enems(index).in).z3 = wall(enems(index).in).z1
       wall(enems(index).in).x4 = x
       wall(enems(index).in).z4 = wall(enems(index).in).z1
-     
+
       IF ABS(cam.x - x) + ABS(cam.z - y) < 450 OR (wall(enems(index).in).p = 7 AND ABS(cam.x - x) + ABS(cam.z - y) < 700) THEN
          dummy% = RND * 255
          IF dummy% > 240 THEN
@@ -600,23 +551,25 @@ SUB DoENEMS
    NEXT index
    animtim% = animtim% + 1
    IF animtim% = 4 THEN animtim% = 0
-   
+
 END SUB
 
 SUB DoINPUT
+DIM c5 AS INTEGER
 
 STATIC lm%
+
 '/* Bewegung */
 
    IF DQBkey%(KEYUP) THEN
          oldx% = cam.x
          oldz% = cam.z
          cam.y = cam.y + Updown%
-         cam.z = cam.z - COS(alpha * DEGtoRAD) * Speed%
-         cam.x = cam.x - SIN(alpha * DEGtoRAD) * Speed%
+         cam.x = cam.x + COS(alpha% * DEGtoRAD) * Speed%
+         cam.z = cam.z + SIN(alpha% * DEGtoRAD) * Speed%
          IF Collision% = 1 THEN
-            cam.x = oldx
-            cam.z = oldz
+            cam.x = oldx%
+            cam.z = oldz%
          END IF
          lm% = 1
    END IF
@@ -624,11 +577,11 @@ STATIC lm%
          oldx% = cam.x
          oldz% = cam.z
          cam.y = cam.y + Updown%
-         cam.x = cam.x + COS(alpha * DEGtoRAD) * Speed%
-         cam.z = cam.z - SIN(alpha * DEGtoRAD) * Speed%
+         cam.x = cam.x - COS(alpha% * DEGtoRAD) * Speed%
+         cam.z = cam.z - SIN(alpha% * DEGtoRAD) * Speed%
          IF Collision% = 1 THEN
-            cam.x = oldx
-            cam.z = oldz
+            cam.x = oldx%
+            cam.z = oldz%
          END IF
          lm% = 1
    END IF
@@ -646,29 +599,29 @@ STATIC lm%
       IF cam.y < 0 THEN cam.y = 0
       IF cam.y > 0 THEN cam.y = cam.y - 3
    END IF
-  
+
    '/* Rotation */
    IF DQBkey%(KEYLEFT) THEN
-      alpha = alpha - rotvel
+      alpha% = alpha% - rotvel%
       lm% = 1
    END IF
    IF DQBkey%(KEYRIGHT) THEN
-      alpha = alpha + rotvel
+      alpha% = alpha% + rotvel%
       lm% = 1
    END IF
-   IF alpha > 360 THEN alpha = 0
-   IF alpha < 0 THEN alpha = 360
+   IF alpha% > 360 THEN alpha% = 0
+   IF alpha% < 0 THEN alpha% = 360
 
    '/* Strafen */
    IF DQBkey%(45) THEN
       oldx% = cam.x
       oldz% = cam.z
       cam.y = cam.y + Updown%
-      cam.x = cam.x + COS((alpha + 90) * DEGtoRAD) * Speed%
-      cam.z = cam.z + SIN((alpha + 90) * DEGtoRAD) * Speed%
+      cam.x = cam.x + COS((alpha% + 90) * DEGtoRAD) * Speed%
+      cam.z = cam.z + SIN((alpha% + 90) * DEGtoRAD) * Speed%
       IF Collision% = 1 THEN
-         cam.x = oldx
-         cam.z = oldz
+         cam.x = oldx%
+         cam.z = oldz%
       END IF
       lm% = 1
    END IF
@@ -676,17 +629,17 @@ STATIC lm%
       oldx% = cam.x
       oldz% = cam.z
       cam.y = cam.y + Updown%
-      cam.x = cam.x + COS((alpha - 90) * DEGtoRAD) * Speed%
-      cam.z = cam.z + SIN((alpha - 90) * DEGtoRAD) * Speed%
+      cam.x = cam.x + COS((alpha% - 90) * DEGtoRAD) * Speed%
+      cam.z = cam.z + SIN((alpha% - 90) * DEGtoRAD) * Speed%
       IF Collision% = 1 THEN
-         cam.x = oldx
-         cam.z = oldz
+         cam.x = oldx%
+         cam.z = oldz%
       END IF
       lm% = 1
    END IF
 
    IF DQBkey(KEYSPACE) THEN
-      d = DQBpoint(COLLISIONLAYER, (cam.x + COS(alpha * DEGtoRAD) * 32) \ 16, (cam.z + SIN(alpha * DEGtoRAD) * 32) \ 16)
+      d = DQBpoint(COLLISIONLAYER, (cam.x + COS(alpha% * DEGtoRAD) * 32) \ 16, (cam.z + SIN(alpha% * DEGtoRAD) * 32) \ 16)
       IF d >= 50 THEN
          IF d - 50 = exitdoor% THEN CALL nextlevel: GOTO skip1:
          doors(d - 50).opening = 1
@@ -732,24 +685,14 @@ skip1:
 
    IF DQBkey%(25) THEN
       DO: LOOP UNTIL NOT DQBkey%(25)
-      DQBprint VIDEO, "GAME PAUSE - PRESS FIRE TO CONTINUE", 20, 96, 1
-      DQBprint VIDEO, "GAME PAUSE - PRESS FIRE TO CONTINUE", 21, 97, 4
+      dqbprint VIDEO, "GAME PAUSE - PRESS FIRE TO CONTINUE", 20, 96, 1
+      dqbprint VIDEO, "GAME PAUSE - PRESS FIRE TO CONTINUE", 21, 97, 4
       DO: LOOP UNTIL DQBkey%(29)
       DO: LOOP UNTIL NOT DQBkey%(29)
    END IF
 
    IF DQBkey%(59) THEN SaveState
    IF DQBkey%(63) THEN loadstat
-
-   c5% = DQBpoint(COLLISIONLAYER, cam.x \ 16, cam.z \ 16)
-   SELECT CASE c5%
-       CASE 2:
-         EraseITEM cam.x \ 16, cam.z \ 16, c5%
-       CASE 3:
-         EraseITEM cam.x \ 16, cam.z \ 16, c5%
-       CASE 4:
-         EraseITEM cam.x \ 16, cam.z \ 16, c5%
-   END SELECT
 END SUB
 
 SUB Drawmap
@@ -766,18 +709,18 @@ DQBpset 1, cam.x \ 16, cam.z \ 16, 4
 END SUB
 
 SUB DrawSTATUS
-DQBprint 1, "HEALTH:" + STR$(health%), 1, 1, 1
-DQBprint 1, "HEALTH:" + STR$(health%), 0, 0, 50
+dqbprint 1, "HEALTH:" + STR$(health%), 1, 1, 1
+dqbprint 1, "HEALTH:" + STR$(health%), 0, 0, 50
 
-DQBprint 1, "ARMOR:" + STR$(armor%), 101, 1, 1
-DQBprint 1, "ARMOR:" + STR$(armor%), 100, 0, 50
+dqbprint 1, "ARMOR:" + STR$(armor%), 101, 1, 1
+dqbprint 1, "ARMOR:" + STR$(armor%), 100, 0, 50
 
 END SUB
 
 SUB EraseITEM (x AS INTEGER, y AS INTEGER, p AS INTEGER)
    FOR index = 0 TO nITEM - 1
       IF wall(items(index).in).x1 = x * 16 AND wall(items(index).in).z1 = y * 16 THEN
-                           
+
          IF p = 2 THEN
             IF health% = 100 THEN EXIT SUB
             health% = health% + 20
@@ -1061,10 +1004,10 @@ LOOP
 
 save$ = "SAVED GAME LOADED"
 savetim = 151
-DQBprint VIDEO, save$, 0, 0, 1
-DQBprint VIDEO, save$, 1, 1, 4
-DQBprint VIDEO, "FIRE WHEN READY", 0, 8, 1
-DQBprint VIDEO, "FIRE WHEN READY", 1, 9, 4
+dqbprint VIDEO, save$, 0, 0, 1
+dqbprint VIDEO, save$, 1, 1, 4
+dqbprint VIDEO, "FIRE WHEN READY", 0, 8, 1
+dqbprint VIDEO, "FIRE WHEN READY", 1, 9, 4
 DO: LOOP UNTIL DQBkey%(29)
 DO: LOOP UNTIL NOT DQBkey%(29)
 
@@ -1111,17 +1054,17 @@ x = 18
 DO
    IF DQBkey%(KEYDOWN) THEN
       DO: LOOP UNTIL NOT DQBkey%(KEYDOWN)
-      DQBprint VIDEO, ">", x, y, 15
+      dqbprint VIDEO, ">", x, y, 15
       y = y + 20
       IF y > 138 THEN y = 98
-      DQBprint VIDEO, ">", x, y, 107
+      dqbprint VIDEO, ">", x, y, 107
    END IF
    IF DQBkey%(KEYUP) THEN
       DO: LOOP UNTIL NOT DQBkey%(KEYUP)
-      DQBprint VIDEO, ">", x, y, 15
+      dqbprint VIDEO, ">", x, y, 15
       y = y - 20
       IF y < 98 THEN y = 138
-      DQBprint VIDEO, ">", x, y, 107
+      dqbprint VIDEO, ">", x, y, 107
    END IF
    IF DQBkey%(KEYENTER) THEN
       DO: LOOP UNTIL NOT DQBkey%(KEYENTER)
@@ -1143,7 +1086,7 @@ DO
          SYSTEM
       END IF
    END IF
-   DQBprint VIDEO, ">", x, y, 107
+   dqbprint VIDEO, ">", x, y, 107
 LOOP
 
 END SUB
@@ -1171,16 +1114,15 @@ SELECT CASE type$
       DQBboxf 1, 0, 0, 319, 199, 15
       dqberr = DQBloadImage(1, 76, 22, "loads\load.bmp", Pal, 168, 155)
       DQBcopyLayer 1, VIDEO
-      DQBprint VIDEO, "Loading Level...", 1, 1, 1
-      DQBprint VIDEO, "Loading Level...", 0, 0, 4
+      dqbprint VIDEO, "Loading Level...", 1, 1, 1
+      dqbprint VIDEO, "Loading Level...", 0, 0, 4
       INPUT #1, level$, textur$, exitdoor%, alpha%
       LoadPOLY level$ + ".map"
       LoadCMP level$ + ".cmp"
       LoadTEX textur$ + ".tex"
-      DQBprint VIDEO, "Fire when ready", 1, 12, 1
-      DQBprint VIDEO, "Fire when ready", 0, 11, 4
-      DO: LOOP UNTIL DQBkey%(29)
-      DO: LOOP UNTIL NOT DQBkey%(29)
+      dqbprint VIDEO, "Press any key when ready", 1, 12, 1
+      dqbprint VIDEO, "Press any key when ready", 0, 11, 4
+      k = DQBreadKey%
       CASE "end":
       DQBremoveKeyboard
       DQBinitText
@@ -1194,8 +1136,7 @@ SELECT CASE type$
             dqberr = DQBloadImage(1, 0, 0, pic$, Pal, 320, 200)
             DQBsetPal Pal
             DQBcopyLayer 1, VIDEO
-            DO: LOOP UNTIL DQBkey%(KEYESC)
-            DO: LOOP UNTIL NOT DQBkey%(KEYESC)
+            k = DQBreadKey%
          NEXT ps
          GOTO begin
 END SELECT
@@ -1235,7 +1176,7 @@ END IF
 
 IF x1& < x2& THEN SWAP x1&, x2&
 
-    
+
 IF IsOnScreen(x2&, y2&, 0, 0, 0, 0) THEN
    offs& = WALLtexBYTE * 2& * aphase%
    IF wall(i).p = 5 THEN
@@ -1287,7 +1228,7 @@ SUB RenderFLOOR
       x2& = 160 + (rpoly(i).x2 * DISTtoPLANE1&) \ (rpoly(i).z2)
       x3& = 160 + (rpoly(i).x3 * DISTtoPLANE1&) \ (rpoly(i).z3)
       x4& = 160 + (rpoly(i).x4 * DISTtoPLANE1&) \ (rpoly(i).z4)
-   
+
       y1& = 100 - (rpoly(i).y1 * DISTtoPLANE2&) \ (rpoly(i).z1)
       y2& = 100 - (rpoly(i).y2 * DISTtoPLANE2&) \ (rpoly(i).z2)
       y3& = 100 - (rpoly(i).y3 * DISTtoPLANE2&) \ (rpoly(i).z3)
@@ -1327,16 +1268,16 @@ IF health% <= 33 THEN DQBput 1, 0, 160, VARSEG(stt(0)), VARPTR(stt(STATtexBYTE *
 DQBput 1, 30, 130, VARSEG(itm(WALLtexBYTE * 2)), VARPTR(itm(WALLtexBYTE * 2))
 
 lenh = LEN(STR$(health%)) * 4
-DQBprint 1, STR$(health%), 18 - lenh, 150, 1
-DQBprint 1, STR$(health%), 17 - lenh, 149, 4
+dqbprint 1, STR$(health%), 18 - lenh, 150, 1
+dqbprint 1, STR$(health%), 17 - lenh, 149, 4
 
 lenh = LEN(STR$(armor%)) * 4
-DQBprint 1, STR$(armor%), 60 - lenh, 150, 1
-DQBprint 1, STR$(armor%), 59 - lenh, 149, 4
+dqbprint 1, STR$(armor%), 60 - lenh, 150, 1
+dqbprint 1, STR$(armor%), 59 - lenh, 149, 4
 
 IF save$ <> "" AND savetim < 100 THEN
-   DQBprint 1, save$, 0, 0, 1
-   DQBprint 1, save$, 1, 1, 4
+   dqbprint 1, save$, 0, 0, 1
+   dqbprint 1, save$, 1, 1, 4
    savetim = savetim + 1
 ELSE
    savetim = 0
@@ -1363,7 +1304,7 @@ DIM i AS INTEGER
       x2& = 160 + (rpoly(i).x2 * DISTtoPLANE1&) \ (rpoly(i).z2)
       x3& = 160 + (rpoly(i).x3 * DISTtoPLANE1&) \ (rpoly(i).z3)
       x4& = 160 + (rpoly(i).x4 * DISTtoPLANE1&) \ (rpoly(i).z4)
-  
+
       y1& = 100 - (rpoly(i).y1 * DISTtoPLANE2&) \ (rpoly(i).z1)
       y2& = 100 - (rpoly(i).y2 * DISTtoPLANE2&) \ (rpoly(i).z2)
       y3& = 100 - (rpoly(i).y3 * DISTtoPLANE2&) \ (rpoly(i).z3)
@@ -1425,7 +1366,7 @@ OPEN "saves\save.dat" FOR OUTPUT AS #2
    WRITE #2, nFLOOR
    WRITE #2, nWALL
    WRITE #2, exitdoor%
-  
+
    FOR index = 0 TO nENEM - 1
       WRITE #2, enems(index).in
       WRITE #2, enems(index).hlth
@@ -1433,7 +1374,7 @@ OPEN "saves\save.dat" FOR OUTPUT AS #2
       WRITE #2, enems(index).move
       WRITE #2, enems(index).stim
    NEXT index
- 
+
    FOR index = 0 TO nFLOOR - 1
       WRITE #2, floor(index).x1
       WRITE #2, floor(index).y1
