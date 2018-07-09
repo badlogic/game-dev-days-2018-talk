@@ -11,7 +11,7 @@ DECLARE SUB RenderWEAP ()
 DECLARE SUB LoadTEX (file$)
 DECLARE FUNCTION CheckSIGHTme% ()
 DECLARE SUB fireME ()
-DECLARE FUNCTION CheckSIGHT% (x1%, y1%, x2%, y2%)
+DECLARE FUNCTION CheckSIGHT% (x1, y1, x2, y2)
 DECLARE SUB Drawmap ()
 DECLARE SUB loadthing ()
 DECLARE SUB RenderENEM (i AS INTEGER)
@@ -178,7 +178,7 @@ SELECT CASE COMMAND$
 END SELECT
 
 frame = 1
-DQBsetFrameRate 40
+REM DQBsetFrameRate 40
 
 DO
    DoENEMS
@@ -197,7 +197,7 @@ DO
    DQBline 1, 161, 100, 165, 100, 14
    DQBline 1, 160, 95, 160, 99, 14
    DQBline 1, 160, 101, 160, 105, 14
-   IF frame THEN DO: LOOP UNTIL DQBframeReady
+   REM IF frame THEN DO: LOOP UNTIL DQBframeReady
    IF map% THEN Drawmap
    DQBcopyLayer 1, VIDEO
    DQBclearLayer 1
@@ -237,7 +237,7 @@ rpoly(index).y4 = wall(index).y4 - cam.y
 rpoly(index).z4 = wall(index).z4 - cam.z
 END SUB
 
-FUNCTION CheckSIGHT% (startx AS INTEGER, starty AS INTEGER, endx AS INTEGER, endy AS INTEGER)
+FUNCTION CheckSIGHT% (startx, starty, endx, endy)
    IF ABS(endx - startx) > ABS(endy - starty) THEN
       IF startx > endx THEN SWAP startx, endx: SWAP starty, endy
       IF (endx - startx) = 0 THEN
@@ -604,16 +604,16 @@ SUB DoENEMS
 END SUB
 
 SUB DoINPUT
+
 STATIC lm%
 '/* Bewegung */
-DIM c5 AS INTEGER
 
    IF DQBkey%(KEYUP) THEN
          oldx% = cam.x
          oldz% = cam.z
          cam.y = cam.y + Updown%
-         cam.x = cam.x + COS(alpha * DEGtoRAD) * Speed%
-         cam.z = cam.z + SIN(alpha * DEGtoRAD) * Speed%
+         cam.z = cam.z - COS(alpha * DEGtoRAD) * Speed%
+         cam.x = cam.x - SIN(alpha * DEGtoRAD) * Speed%
          IF Collision% = 1 THEN
             cam.x = oldx
             cam.z = oldz
@@ -624,7 +624,7 @@ DIM c5 AS INTEGER
          oldx% = cam.x
          oldz% = cam.z
          cam.y = cam.y + Updown%
-         cam.x = cam.x - COS(alpha * DEGtoRAD) * Speed%
+         cam.x = cam.x + COS(alpha * DEGtoRAD) * Speed%
          cam.z = cam.z - SIN(alpha * DEGtoRAD) * Speed%
          IF Collision% = 1 THEN
             cam.x = oldx
@@ -648,7 +648,7 @@ DIM c5 AS INTEGER
    END IF
   
    '/* Rotation */
-   IF DQBkey%(KEYLEFT) OR 1 THEN
+   IF DQBkey%(KEYLEFT) THEN
       alpha = alpha - rotvel
       lm% = 1
    END IF
@@ -741,14 +741,14 @@ skip1:
    IF DQBkey%(59) THEN SaveState
    IF DQBkey%(63) THEN loadstat
 
-   c5 = DQBpoint(COLLISIONLAYER, cam.x \ 16, cam.z \ 16)
-   SELECT CASE c5
+   c5% = DQBpoint(COLLISIONLAYER, cam.x \ 16, cam.z \ 16)
+   SELECT CASE c5%
        CASE 2:
-         EraseITEM cam.x \ 16, cam.z \ 16, c5
+         EraseITEM cam.x \ 16, cam.z \ 16, c5%
        CASE 3:
-         EraseITEM cam.x \ 16, cam.z \ 16, c5
+         EraseITEM cam.x \ 16, cam.z \ 16, c5%
        CASE 4:
-         EraseITEM cam.x \ 16, cam.z \ 16, c5
+         EraseITEM cam.x \ 16, cam.z \ 16, c5%
    END SELECT
 END SUB
 
@@ -1100,7 +1100,7 @@ END SUB
 SUB menu
 DIM x AS INTEGER
 DIM y AS INTEGER
-                
+
 dqberr = DQBloadImage(1, 0, 0, "scenes\menu.bmp", Pal, 320, 200)
 DQBsetPal Pal
 DQBcopyLayer 1, VIDEO
@@ -1346,7 +1346,6 @@ END IF
 END SUB
 
 SUB RenderWALL
-DIM index AS INTEGER
 DIM i AS INTEGER
 
    FOR index = slindex% - 1 TO 0 STEP -1
@@ -1495,6 +1494,7 @@ END SUB
 
 SUB TranslateWALL
 DIM index AS INTEGER
+
    FOR index = 0 TO nWALL - 1
       IF wall(index).y1 = -34 THEN GOTO skip3DOOR
       AddCAMWALL index
