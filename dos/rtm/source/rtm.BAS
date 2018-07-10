@@ -201,8 +201,8 @@ DO
    ' DoENEMS
    ' DoDOORS
    TranslateFLOOR
-   slIndex% = 0
-   ' RenderFLOOR
+   ' slIndex% = 0
+   RenderFLOOR
    ' TranslateWALL
    ' RenderWALL
    ' RenderWEAP
@@ -1450,17 +1450,13 @@ END SUB
 
 SUB TranslateFLOOR
 DIM index AS INTEGER
-DIM p AS POL
 
    translatePolygons VARSEG(floor(0)), VARPTR(floor(0)), VARSEG(rpoly(0)), VARPTR(rpoly(0)), -cam.x, -cam.y, -cam.z, nFLOOR
-   'rotatePolygons VARSEG(floor(0)), VARPTR(floor(0)), VARSEG(rpoly(0)), VARPTR(rpoly(0)), cosine%(alpha%), sine%(alpha%), 1
+   rotatePolygons VARSEG(rpoly(0)), VARPTR(rpoly(0)), cosine%(alpha%), sine%(alpha%), nFLOOR
 
    FOR index = 0 TO nFLOOR - 1
-      ' AddCAMFLOOR index
-      p.x1 = rpoly(index).x1
-      p.z1 = rpoly(index).z1
-      rotatePolygons VARSEG(p), VARPTR(p), cosine%(alpha%), sine%(alpha%), 1
-      RotateY index
+      'AddCAMFLOOR index
+      'RotateY index
       IF ClipPOLY%(index) = 0 THEN
          slist(slIndex%).i = index
          'slist(slindex%).z = (rpoly(index).z1 + rpoly(index).z2 + rpoly(index).z3 + rpoly(index).z4) \ 4

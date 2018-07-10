@@ -120,12 +120,14 @@ rotatePolygons proc polysSeg:word, polysOff:word, cosine:word, sine:word, numPol
 loop_polys:
     push cx
 
-    movsx eax, cosine
-    movsx ebx, sine
+    movsx eax, word ptr cosine
+    movsx ebx, word ptr sine
 
+    ;----------------------------
     ; x1, z1
-    movsx ecx, ds:[si]
-    movsx edx, ds:[si + 16]
+    ;----------------------------
+    movsx ecx, word ptr ds:[si]
+    movsx edx, word ptr ds:[si + 16]
 
     ; x1' = z1 * cos
     mov edi, edx
@@ -140,7 +142,123 @@ loop_polys:
     sar edx, 8
     mov ds:[si], dx
 
+    ; z1' = x1 * cos
+    movsx edx, word ptr ds:[si + 16]
+    mov edi, ecx
+    imul edi, eax
+    push edi
+
+    ; z1' = (x1 * cos + z1 * sin) / 256
+    mov edi, edx
+    imul edi, ebx
+    pop edx
+    add edx, edi
+    sar edx, 8
+    mov ds:[si + 16], dx
+
+    ;----------------------------
+    ; x2, z2
+    ;----------------------------
+    movsx ecx, word ptr ds:[si + 2]
+    movsx edx, word ptr ds:[si + 18]
+
+    ; x1' = z1 * cos
+    mov edi, edx
+    imul edi, eax
+    push edi
+
+    ; x1' = (z1 * cos - x1 * sin) / 256
+    mov edi, ecx
+    imul edi, ebx
+    pop edx
+    sub edx, edi
+    sar edx, 8
+    mov ds:[si + 2], dx
+
+    ; z1' = x1 * cos
+    movsx edx, word ptr ds:[si + 18]
+    mov edi, ecx
+    imul edi, eax
+    push edi
+
+    ; z1' = (x1 * cos + z1 * sin) / 256
+    mov edi, edx
+    imul edi, ebx
+    pop edx
+    add edx, edi
+    sar edx, 8
+    mov ds:[si + 18], dx
+
+    ;----------------------------
+    ; x3, z3
+    ;----------------------------
+    movsx ecx, word ptr ds:[si + 4]
+    movsx edx, word ptr ds:[si + 20]
+
+    ; x1' = z1 * cos
+    mov edi, edx
+    imul edi, eax
+    push edi
+
+    ; x1' = (z1 * cos - x1 * sin) / 256
+    mov edi, ecx
+    imul edi, ebx
+    pop edx
+    sub edx, edi
+    sar edx, 8
+    mov ds:[si + 4], dx
+
+    ; z1' = x1 * cos
+    movsx edx, word ptr ds:[si + 20]
+    mov edi, ecx
+    imul edi, eax
+    push edi
+
+    ; z1' = (x1 * cos + z1 * sin) / 256
+    mov edi, edx
+    imul edi, ebx
+    pop edx
+    add edx, edi
+    sar edx, 8
+    mov ds:[si + 20], dx
+
+
+    ;----------------------------
+    ; x4, z4
+    ;----------------------------
+    movsx ecx, word ptr ds:[si + 6]
+    movsx edx, word ptr ds:[si + 22]
+
+    ; x1' = z1 * cos
+    mov edi, edx
+    imul edi, eax
+    push edi
+
+    ; x1' = (z1 * cos - x1 * sin) / 256
+    mov edi, ecx
+    imul edi, ebx
+    pop edx
+    sub edx, edi
+    sar edx, 8
+    mov ds:[si + 6], dx
+
+    ; z1' = x1 * cos
+    movsx edx, word ptr ds:[si + 22]
+    mov edi, ecx
+    imul edi, eax
+    push edi
+
+    ; z1' = (x1 * cos + z1 * sin) / 256
+    mov edi, edx
+    imul edi, ebx
+    pop edx
+    add edx, edi
+    sar edx, 8
+    mov ds:[si + 22], dx
+
+    ;----------------------------
     ; next polygon is 36 bytes away
+    ;----------------------------
     mov ax, 28
     add si, ax
 
