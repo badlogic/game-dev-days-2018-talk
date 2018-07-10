@@ -34,6 +34,7 @@ DECLARE FUNCTION ClipPOLY% (index AS INTEGER)
 DECLARE SUB LoadTRIG ()
 DECLARE SUB LoadPOLY (file AS STRING)
 DECLARE SUB RotateY (index AS INTEGER)
+'$INCLUDE: 'source\utils.bi'
 '$INCLUDE: 'source\directqb.bi'
 
 TYPE POL
@@ -127,7 +128,7 @@ CONST crad = 1
 CONST Speed% = 8
 CONST rotvel% = 2
 DIM SHARED cam AS KAMERA
-DIM SHARED alpha%, slindex%, Updown%, vy%
+DIM SHARED alpha%, slIndex%, Updown%, vy%
 DIM SHARED oldx%, oldz%
 DIM SHARED health%, armor%
 DIM SHARED animtim%
@@ -140,13 +141,17 @@ DIM SHARED save$, savetim
 DIM SHARED level$, textur$
 DIM SHARED modus%
 DIM SHARED le%
+DIM SHARED floorTriangles AS INTEGER
+DIM SHARED wallTriangles AS INTEGER
+DIM SHARED frameCounter AS INTEGER
+DIM SHARED frameStartTime AS SINGLE
+DIM SHARED duration AS SINGLE
+DIM SHARED FPS AS SINGLE
 
 vy% = 1
 weapanim% = 0
 firetim% = 10
 watim% = 0
-
-
 
 SCREEN 13
 dqberr = DQBinit(7, 0, 0)
@@ -154,9 +159,6 @@ dqberr = DQBloadImage(1, 0, 0, "loads\pal.bmp", Pal, 320, 200)
 DQBsetPal Pal
 DQBsetTextureSize 64
 DQBinstallKeyboard
-
-
-
 
 LoadTRIG
 LoadSPR
@@ -180,26 +182,40 @@ END SELECT
 frame = 1
 REM DQBsetFrameRate 40
 
+frameStartTime = TIMER
+frameCounter = 0
+FPS = 0
+
 DO
-   DoENEMS
-   DoDOORS
+   floorTriangles = 0
+   wallTriangles = 0
+   frameCounter = frameCounter + 1
+   duration = TIMER - frameStartTime
+   IF (duration >= 2) THEN
+      FPS = frameCounter / duration
+      frameCounter = 0
+      frameStartTime = TIMER
+   END IF
+   ' DoENEMS
+   ' DoDOORS
    TranslateFLOOR
-   RenderFLOOR
-   TranslateWALL
-   RenderWALL
-   RenderWEAP
+   slIndex% = 0
+   ' RenderFLOOR
+   ' TranslateWALL
+   ' RenderWALL
+   ' RenderWEAP
    IF armor% < 0 THEN armor% = 0
    IF health% < 0 THEN health% = 0
    IF health% = 0 THEN dead
-   RenderSTAT
+   ' RenderSTAT
    DoINPUT
-   DQBline 1, 155, 100, 159, 100, 14
-   DQBline 1, 161, 100, 165, 100, 14
-   DQBline 1, 160, 95, 160, 99, 14
-   DQBline 1, 160, 101, 160, 105, 14
-   dqbprint 1, STR$(alpha%), 0, 0, 1
+   ' DQBline 1, 155, 100, 159, 100, 14
+   ' DQBline 1, 161, 100, 165, 100, 14
+   ' DQBline 1, 160, 95, 160, 99, 14
+   ' DQBline 1, 160, 101, 160, 105, 14
+   DQBprint 1, "fps: " + STR$(FPS) + ", floor tris:" + STR$(floorTriangles), 0, 0, 1
    REM IF frame THEN DO: LOOP UNTIL DQBframeReady
-   IF map% THEN Drawmap
+   ' IF map% THEN Drawmap
    DQBcopyLayer 1, VIDEO
    DQBclearLayer 1
 LOOP UNTIL DQBkey%(KEYESC)
@@ -385,17 +401,17 @@ x = 24
 DO
    IF DQBkey%(KEYDOWN) THEN
       DO: LOOP UNTIL NOT DQBkey%(KEYDOWN)
-      dqbprint VIDEO, ">", x, y, 15
+      DQBprint VIDEO, ">", x, y, 15
       y = y + 20
       IF y > 56 THEN y = 16
-      dqbprint VIDEO, ">", x, y, 107
+      DQBprint VIDEO, ">", x, y, 107
    END IF
    IF DQBkey%(KEYUP) THEN
       DO: LOOP UNTIL NOT DQBkey%(KEYUP)
-      dqbprint VIDEO, ">", x, y, 15
+      DQBprint VIDEO, ">", x, y, 15
       y = y - 20
       IF y < 16 THEN y = 56
-      dqbprint VIDEO, ">", x, y, 107
+      DQBprint VIDEO, ">", x, y, 107
    END IF
    IF DQBkey%(KEYENTER) THEN
       DO: LOOP UNTIL NOT DQBkey%(KEYENTER)
@@ -418,7 +434,7 @@ DO
          SYSTEM
       END IF
    END IF
-   dqbprint VIDEO, ">", x, y, 107
+   DQBprint VIDEO, ">", x, y, 107
 LOOP
 
 
@@ -685,8 +701,8 @@ skip1:
 
    IF DQBkey%(25) THEN
       DO: LOOP UNTIL NOT DQBkey%(25)
-      dqbprint VIDEO, "GAME PAUSE - PRESS FIRE TO CONTINUE", 20, 96, 1
-      dqbprint VIDEO, "GAME PAUSE - PRESS FIRE TO CONTINUE", 21, 97, 4
+      DQBprint VIDEO, "GAME PAUSE - PRESS FIRE TO CONTINUE", 20, 96, 1
+      DQBprint VIDEO, "GAME PAUSE - PRESS FIRE TO CONTINUE", 21, 97, 4
       DO: LOOP UNTIL DQBkey%(29)
       DO: LOOP UNTIL NOT DQBkey%(29)
    END IF
@@ -709,11 +725,11 @@ DQBpset 1, cam.x \ 16, cam.z \ 16, 4
 END SUB
 
 SUB DrawSTATUS
-dqbprint 1, "HEALTH:" + STR$(health%), 1, 1, 1
-dqbprint 1, "HEALTH:" + STR$(health%), 0, 0, 50
+DQBprint 1, "HEALTH:" + STR$(health%), 1, 1, 1
+DQBprint 1, "HEALTH:" + STR$(health%), 0, 0, 50
 
-dqbprint 1, "ARMOR:" + STR$(armor%), 101, 1, 1
-dqbprint 1, "ARMOR:" + STR$(armor%), 100, 0, 50
+DQBprint 1, "ARMOR:" + STR$(armor%), 101, 1, 1
+DQBprint 1, "ARMOR:" + STR$(armor%), 100, 0, 50
 
 END SUB
 
@@ -1004,10 +1020,10 @@ LOOP
 
 save$ = "SAVED GAME LOADED"
 savetim = 151
-dqbprint VIDEO, save$, 0, 0, 1
-dqbprint VIDEO, save$, 1, 1, 4
-dqbprint VIDEO, "FIRE WHEN READY", 0, 8, 1
-dqbprint VIDEO, "FIRE WHEN READY", 1, 9, 4
+DQBprint VIDEO, save$, 0, 0, 1
+DQBprint VIDEO, save$, 1, 1, 4
+DQBprint VIDEO, "FIRE WHEN READY", 0, 8, 1
+DQBprint VIDEO, "FIRE WHEN READY", 1, 9, 4
 DO: LOOP UNTIL DQBkey%(29)
 DO: LOOP UNTIL NOT DQBkey%(29)
 
@@ -1054,17 +1070,17 @@ x = 18
 DO
    IF DQBkey%(KEYDOWN) THEN
       DO: LOOP UNTIL NOT DQBkey%(KEYDOWN)
-      dqbprint VIDEO, ">", x, y, 15
+      DQBprint VIDEO, ">", x, y, 15
       y = y + 20
       IF y > 138 THEN y = 98
-      dqbprint VIDEO, ">", x, y, 107
+      DQBprint VIDEO, ">", x, y, 107
    END IF
    IF DQBkey%(KEYUP) THEN
       DO: LOOP UNTIL NOT DQBkey%(KEYUP)
-      dqbprint VIDEO, ">", x, y, 15
+      DQBprint VIDEO, ">", x, y, 15
       y = y - 20
       IF y < 98 THEN y = 138
-      dqbprint VIDEO, ">", x, y, 107
+      DQBprint VIDEO, ">", x, y, 107
    END IF
    IF DQBkey%(KEYENTER) THEN
       DO: LOOP UNTIL NOT DQBkey%(KEYENTER)
@@ -1086,7 +1102,7 @@ DO
          SYSTEM
       END IF
    END IF
-   dqbprint VIDEO, ">", x, y, 107
+   DQBprint VIDEO, ">", x, y, 107
 LOOP
 
 END SUB
@@ -1114,14 +1130,14 @@ SELECT CASE type$
       DQBboxf 1, 0, 0, 319, 199, 15
       dqberr = DQBloadImage(1, 76, 22, "loads\load.bmp", Pal, 168, 155)
       DQBcopyLayer 1, VIDEO
-      dqbprint VIDEO, "Loading Level...", 1, 1, 1
-      dqbprint VIDEO, "Loading Level...", 0, 0, 4
+      DQBprint VIDEO, "Loading Level...", 1, 1, 1
+      DQBprint VIDEO, "Loading Level...", 0, 0, 4
       INPUT #1, level$, textur$, exitdoor%, alpha%
       LoadPOLY level$ + ".map"
       LoadCMP level$ + ".cmp"
       LoadTEX textur$ + ".tex"
-      dqbprint VIDEO, "Press any key when ready", 1, 12, 1
-      dqbprint VIDEO, "Press any key when ready", 0, 11, 4
+      DQBprint VIDEO, "Press any key when ready", 1, 12, 1
+      DQBprint VIDEO, "Press any key when ready", 0, 11, 4
       k = DQBreadKey%
       CASE "end":
       DQBremoveKeyboard
@@ -1216,7 +1232,7 @@ END IF
 END SUB
 
 SUB RenderFLOOR
-   FOR index = slindex% - 1 TO 0 STEP -1
+   FOR index = slIndex% - 1 TO 0 STEP -1
       i = slist(index).i
       IF i < 0 THEN GOTO skip
       IF rpoly(i).z1 <= 0 THEN rpoly(i).z1 = 1
@@ -1236,14 +1252,17 @@ SUB RenderFLOOR
 
       IF IsOnScreen(x1&, y1&, x2&, y2&, x3&, y3&) THEN
          DQBttri 1, x1&, y1&, x2&, y2&, x3&, y3&, 0, 0, 0, 63, 63, 63, VARSEG(tex(0)), VARPTR(tex(WALLtexBYTE * floor(i).texnum))
+         floorTriangles = floorTriangles + 1
       END IF
       IF IsOnScreen(x1&, y1&, x4&, y4&, x3&, y3&) THEN
          DQBttri 1, x1&, y1&, x4&, y4&, x3&, y3&, 0, 0, 63, 0, 63, 63, VARSEG(tex(0)), VARPTR(tex(WALLtexBYTE * floor(i).texnum))
+         floorTriangles = floorTriangles + 1
       END IF
 
 skip:
    NEXT index
-   slindex% = 0
+endRenderFloor:
+   slIndex% = 0
 
 END SUB
 
@@ -1268,16 +1287,16 @@ IF health% <= 33 THEN DQBput 1, 0, 160, VARSEG(stt(0)), VARPTR(stt(STATtexBYTE *
 DQBput 1, 30, 130, VARSEG(itm(WALLtexBYTE * 2)), VARPTR(itm(WALLtexBYTE * 2))
 
 lenh = LEN(STR$(health%)) * 4
-dqbprint 1, STR$(health%), 18 - lenh, 150, 1
-dqbprint 1, STR$(health%), 17 - lenh, 149, 4
+DQBprint 1, STR$(health%), 18 - lenh, 150, 1
+DQBprint 1, STR$(health%), 17 - lenh, 149, 4
 
 lenh = LEN(STR$(armor%)) * 4
-dqbprint 1, STR$(armor%), 60 - lenh, 150, 1
-dqbprint 1, STR$(armor%), 59 - lenh, 149, 4
+DQBprint 1, STR$(armor%), 60 - lenh, 150, 1
+DQBprint 1, STR$(armor%), 59 - lenh, 149, 4
 
 IF save$ <> "" AND savetim < 100 THEN
-   dqbprint 1, save$, 0, 0, 1
-   dqbprint 1, save$, 1, 1, 4
+   DQBprint 1, save$, 0, 0, 1
+   DQBprint 1, save$, 1, 1, 4
    savetim = savetim + 1
 ELSE
    savetim = 0
@@ -1289,7 +1308,7 @@ END SUB
 SUB RenderWALL
 DIM i AS INTEGER
 
-   FOR index = slindex% - 1 TO 0 STEP -1
+   FOR index = slIndex% - 1 TO 0 STEP -1
       i = slist(index).i
       IF i < 0 THEN GOTO skip2
       IF wall(i).p = 2 OR wall(i).p = 3 OR wall(i).p = 4 THEN CALL RenderITEM(i, 64, 64): GOTO skip2
@@ -1319,7 +1338,7 @@ DIM i AS INTEGER
 
 skip2:
    NEXT index
-   slindex% = 0
+   slIndex% = 0
 
 
 END SUB
@@ -1426,9 +1445,9 @@ DIM index AS INTEGER
       AddCAMFLOOR index
       RotateY index
       IF ClipPOLY%(index) = 0 THEN
-         slist(slindex%).i = index
+         slist(slIndex%).i = index
          'slist(slindex%).z = (rpoly(index).z1 + rpoly(index).z2 + rpoly(index).z3 + rpoly(index).z4) \ 4
-         slindex% = slindex% + 1
+         slIndex% = slIndex% + 1
       END IF
    NEXT index
 END SUB
@@ -1441,12 +1460,12 @@ DIM index AS INTEGER
       AddCAMWALL index
       RotateY index
       IF ClipPOLY%(index) = 0 THEN
-         slist(slindex%).i = index
-         slist(slindex%).z = (rpoly(index).z1 + rpoly(index).z2 + rpoly(index).z3 + rpoly(index).z4) \ 4
-         slindex% = slindex% + 1
+         slist(slIndex%).i = index
+         slist(slIndex%).z = (rpoly(index).z1 + rpoly(index).z2 + rpoly(index).z3 + rpoly(index).z4) \ 4
+         slIndex% = slIndex% + 1
       END IF
 skip3DOOR:
    NEXT index
-   DQBsort VARSEG(slist(0)), VARPTR(slist(0)), slindex%, 4, 0
+   DQBsort VARSEG(slist(0)), VARPTR(slist(0)), slIndex%, 4, 0
 END SUB
 

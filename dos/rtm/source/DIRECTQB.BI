@@ -9,14 +9,11 @@
 ' Include file created on 12-02-2000 by the DirectQB Library Manager v1.2
 ' Run DQBMAN again to modify your DirectQB module settings
 '
-' þ Read DIRECTQB.DOC for detailed informations on how to use the library
+' ï¿½ Read DIRECTQB.DOC for detailed informations on how to use the library
 '----------------------------------------------------------------------------
 
 '$DYNAMIC
 DEFINT A-Z
-
-'Meine Routine zum Kopieren der Speicherbl”cke
-DECLARE SUB copymem (BYVAL sourceSEG%, BYVAL sourceOFF&, BYVAL DestSEG%, BYVAL DestOFF%, BYVAL leng%)
 
 ' Procedures from MAIN.OBJ:
 DECLARE FUNCTION DQBinit% (BYVAL NumLayers%, BYVAL NumSounds%, BYVAL MemSize%)
