@@ -1,0 +1,122 @@
+DIRECTQB.BI and CALLS.BAS successfully created
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\BC CALLS.BAS,,NUL /O /S
+Microsoft (R) QuickBASIC Compiler Version 4.50
+(C) Copyright Microsoft Corporation 1982-1988.
+All rights reserved.
+Simultaneously published in the U.S. and Canada.
+
+44029 Bytes Available
+38189 Bytes Free
+
+    0 Warning Error(s)
+    0 Severe  Error(s)
+
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\LIB DQB.LIB C:\QB45\QB.LIB;
+
+Microsoft (R) Library Manager  Version 3.14   
+Copyright (C) Microsoft Corp 1983-1988.  All rights reserved.
+
+
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\LIB DQB.LIB +MAIN.OBJ;
+
+Microsoft (R) Library Manager  Version 3.14   
+Copyright (C) Microsoft Corp 1983-1988.  All rights reserved.
+
+
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\LIB DQB.LIB +DRAW.OBJ;
+
+Microsoft (R) Library Manager  Version 3.14   
+Copyright (C) Microsoft Corp 1983-1988.  All rights reserved.
+
+
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\LIB DQB.LIB +IMAGE.OBJ;
+
+Microsoft (R) Library Manager  Version 3.14   
+Copyright (C) Microsoft Corp 1983-1988.  All rights reserved.
+
+
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\LIB DQB.LIB +SPRITE.OBJ;
+
+Microsoft (R) Library Manager  Version 3.14   
+Copyright (C) Microsoft Corp 1983-1988.  All rights reserved.
+
+
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\LIB DQB.LIB +PALETTE.OBJ;
+
+Microsoft (R) Library Manager  Version 3.14   
+Copyright (C) Microsoft Corp 1983-1988.  All rights reserved.
+
+
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\LIB DQB.LIB +FONT.OBJ;
+
+Microsoft (R) Library Manager  Version 3.14   
+Copyright (C) Microsoft Corp 1983-1988.  All rights reserved.
+
+
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\LIB DQB.LIB +BLENDING.OBJ;
+
+Microsoft (R) Library Manager  Version 3.14   
+Copyright (C) Microsoft Corp 1983-1988.  All rights reserved.
+
+
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\LIB DQB.LIB +KEYBOARD.OBJ;
+
+Microsoft (R) Library Manager  Version 3.14   
+Copyright (C) Microsoft Corp 1983-1988.  All rights reserved.
+
+
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\LIB DQB.LIB +MOUSE.OBJ;
+
+Microsoft (R) Library Manager  Version 3.14   
+Copyright (C) Microsoft Corp 1983-1988.  All rights reserved.
+
+
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\LIB DQB.LIB +3D.OBJ;
+
+Microsoft (R) Library Manager  Version 3.14   
+Copyright (C) Microsoft Corp 1983-1988.  All rights reserved.
+
+
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\LIB DQB.LIB +CALLS;
+
+Microsoft (R) Library Manager  Version 3.14   
+Copyright (C) Microsoft Corp 1983-1988.  All rights reserved.
+
+
+----------------------------------------------------------------------------
+Shell command:
+C:\QB45\LINK /Q DQB.LIB,DQB.QLB,NUL,C:\QB45\BQLB45.LIB
+
+Microsoft (R) Overlay Linker  Version 3.69   
+Copyright (C) Microsoft Corp 1983-1988.  All rights reserved.
+
+
+----------------------------------------------------------------------------
+Temporary files deleted
+Operation complete

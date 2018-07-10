@@ -34,8 +34,10 @@ DECLARE FUNCTION ClipPOLY% (index AS INTEGER)
 DECLARE SUB LoadTRIG ()
 DECLARE SUB LoadPOLY (file AS STRING)
 DECLARE SUB RotateY (index AS INTEGER)
+
 '$INCLUDE: 'source\utils.bi'
-'$INCLUDE: 'source\directqb.bi'
+
+'$INCLUDE: 'source\directqb\directqb.bi'
 
 TYPE POL
    x1 AS INTEGER
@@ -98,7 +100,7 @@ DIM SHARED nITEM AS INTEGER
 DIM SHARED nENEM AS INTEGER
 
 '$STATIC
-DIM SHARED Cosine%(360), Sine%(360)
+DIM SHARED cosine%(360), sine%(360)
 CONST DEGtoRAD! = 3.141593 / 180
 CONST DQBtoRAD! = 360 / 255
 
@@ -191,7 +193,7 @@ DO
    wallTriangles = 0
    frameCounter = frameCounter + 1
    duration = TIMER - frameStartTime
-   IF (duration >= 2) THEN
+   IF (duration >= 1) THEN
       FPS = frameCounter / duration
       frameCounter = 0
       frameStartTime = TIMER
@@ -213,7 +215,7 @@ DO
    ' DQBline 1, 161, 100, 165, 100, 14
    ' DQBline 1, 160, 95, 160, 99, 14
    ' DQBline 1, 160, 101, 160, 105, 14
-   DQBprint 1, "fps: " + STR$(FPS) + ", floor tris:" + STR$(floorTriangles), 0, 0, 1
+   DQBprint 1, "fps: " + STR$(FPS) + ", ftris:" + STR$(floorTriangles) + ", yrot: " + STR$(alpha), 0, 0, 1
    REM IF frame THEN DO: LOOP UNTIL DQBframeReady
    ' IF map% THEN Drawmap
    DQBcopyLayer 1, VIDEO
@@ -267,8 +269,8 @@ FUNCTION CheckSIGHT% (startx, starty, endx, endy)
       WHILE x! <= endx
          x! = x! + 1
          y! = y! + k!
-         col = DQBpoint(COLLISIONLAYER, x!, y!)
-         IF col = 1 OR col > 49 THEN CheckSIGHT% = 1: EXIT FUNCTION
+         Col = DQBpoint(COLLISIONLAYER, x!, y!)
+         IF Col = 1 OR Col > 49 THEN CheckSIGHT% = 1: EXIT FUNCTION
 '         IF col > 4 AND col < 8 AND startx = cam.x \ 16 THEN CheckSIGHT% = 2: endx = x!: endy = y!: EXIT FUNCTION
       WEND
       CheckSIGHT% = 0
@@ -284,8 +286,8 @@ FUNCTION CheckSIGHT% (startx, starty, endx, endy)
       WHILE y! <= endy
          x! = x! + k!
          y! = y! + 1
-         col = DQBpoint(COLLISIONLAYER, x!, y!)
-         IF col = 1 OR col > 49 THEN CheckSIGHT% = 1: EXIT FUNCTION
+         Col = DQBpoint(COLLISIONLAYER, x!, y!)
+         IF Col = 1 OR Col > 49 THEN CheckSIGHT% = 1: EXIT FUNCTION
       '   IF col > 4 AND col < 8 AND startx = cam.x \ 16 THEN CheckSIGHT% = 2: endx = x!: endy = y!: EXIT FUNCTION
       WEND
       CheckSIGHT% = 0
@@ -365,7 +367,7 @@ dy = 0
 FOR cy = y - 1 TO y + 1
    FOR cx = x - 1 TO x + 1
        c1 = DQBpoint(COLLISIONLAYER, cx, cy)
-      
+
        SELECT CASE c1
          CASE 1:
             Collision% = 1
@@ -1043,10 +1045,10 @@ DEF SEG
 END SUB
 
 SUB LoadTRIG
-DEF SEG = VARSEG(Cosine%(0))
-BLOAD "TABLE\Cosine.dat", VARPTR(Cosine%(0))
-DEF SEG = VARSEG(Sine%(0))
-BLOAD "TABLE\Sine.dat", VARPTR(Sine%(0))
+DEF SEG = VARSEG(cosine%(0))
+BLOAD "TABLE\Cosine.dat", VARPTR(cosine%(0))
+DEF SEG = VARSEG(sine%(0))
+BLOAD "TABLE\Sine.dat", VARPTR(sine%(0))
 DEF SEG
 END SUB
 
@@ -1234,7 +1236,9 @@ END SUB
 SUB RenderFLOOR
    FOR index = slIndex% - 1 TO 0 STEP -1
       i = slist(index).i
-      IF i < 0 THEN GOTO skip
+      IF i < 0 THEN
+         GOTO skip
+      END IF
       IF rpoly(i).z1 <= 0 THEN rpoly(i).z1 = 1
       IF rpoly(i).z2 <= 0 THEN rpoly(i).z2 = 1
       IF rpoly(i).z3 <= 0 THEN rpoly(i).z3 = 1
@@ -1355,18 +1359,24 @@ END SUB
 
 SUB RotateY (index AS INTEGER)
 DIM tempx%
+DIM cosCache AS INTEGER
+DIM sinCache AS INTEGER
+
+cosCache = cosine%(alpha%)
+sinCache = sine%(alpha%)
+
    tempx% = rpoly(index).x1
-   rpoly(index).x1 = CLNG((CLNG(rpoly(index).z1) * Cosine%(alpha%) - CLNG(rpoly(index).x1) * Sine%(alpha%))) \ 256
-   rpoly(index).z1 = CLNG((CLNG(tempx%) * Cosine%(alpha%) + CLNG(rpoly(index).z1) * Sine%(alpha%))) \ 256
+   rpoly(index).x1 = CLNG((CLNG(rpoly(index).z1) * cosCache - CLNG(rpoly(index).x1) * sinCache)) \ 256
+   rpoly(index).z1 = CLNG((CLNG(tempx%) * cosCache + CLNG(rpoly(index).z1) * sinCache)) \ 256
    tempx% = rpoly(index).x2
-   rpoly(index).x2 = CLNG((CLNG(rpoly(index).z2) * Cosine%(alpha%) - CLNG(rpoly(index).x2) * Sine%(alpha%))) \ 256
-   rpoly(index).z2 = CLNG((CLNG(tempx%) * Cosine%(alpha%) + CLNG(rpoly(index).z2) * Sine%(alpha%))) \ 256
+   rpoly(index).x2 = CLNG((CLNG(rpoly(index).z2) * cosCache - CLNG(rpoly(index).x2) * sinCache)) \ 256
+   rpoly(index).z2 = CLNG((CLNG(tempx%) * cosCache + CLNG(rpoly(index).z2) * sinCache)) \ 256
    tempx% = rpoly(index).x3
-   rpoly(index).x3 = CLNG((CLNG(rpoly(index).z3) * Cosine%(alpha%) - CLNG(rpoly(index).x3) * Sine%(alpha%))) \ 256
-   rpoly(index).z3 = CLNG((CLNG(tempx%) * Cosine%(alpha%) + CLNG(rpoly(index).z3) * Sine%(alpha%))) \ 256
+   rpoly(index).x3 = CLNG((CLNG(rpoly(index).z3) * cosCache - CLNG(rpoly(index).x3) * sinCache)) \ 256
+   rpoly(index).z3 = CLNG((CLNG(tempx%) * cosCache + CLNG(rpoly(index).z3) * sinCache)) \ 256
    tempx% = rpoly(index).x4
-   rpoly(index).x4 = CLNG((CLNG(rpoly(index).z4) * Cosine%(alpha%) - CLNG(rpoly(index).x4) * Sine%(alpha%))) \ 256
-   rpoly(index).z4 = CLNG((CLNG(tempx%) * Cosine%(alpha%) + CLNG(rpoly(index).z4) * Sine%(alpha%))) \ 256
+   rpoly(index).x4 = CLNG((CLNG(rpoly(index).z4) * cosCache - CLNG(rpoly(index).x4) * sinCache)) \ 256
+   rpoly(index).z4 = CLNG((CLNG(tempx%) * cosCache + CLNG(rpoly(index).z4) * sinCache)) \ 256
 END SUB
 
 SUB SaveState
@@ -1440,9 +1450,16 @@ END SUB
 
 SUB TranslateFLOOR
 DIM index AS INTEGER
+DIM p AS POL
+
+   translatePolygons VARSEG(floor(0)), VARPTR(floor(0)), VARSEG(rpoly(0)), VARPTR(rpoly(0)), -cam.x, -cam.y, -cam.z, nFLOOR
+   'rotatePolygons VARSEG(floor(0)), VARPTR(floor(0)), VARSEG(rpoly(0)), VARPTR(rpoly(0)), cosine%(alpha%), sine%(alpha%), 1
 
    FOR index = 0 TO nFLOOR - 1
-      AddCAMFLOOR index
+      ' AddCAMFLOOR index
+      p.x1 = rpoly(index).x1
+      p.z1 = rpoly(index).z1
+      rotatePolygons VARSEG(p), VARPTR(p), cosine%(alpha%), sine%(alpha%), 1
       RotateY index
       IF ClipPOLY%(index) = 0 THEN
          slist(slIndex%).i = index
