@@ -1,0 +1,335 @@
+#------------------------------------------------------------------------------
+# Yagl makefile for mingw win32 and linux
+# for building the vc version of yagl use the workspaces 
+# for vc6 and vc7
+#
+# NOTE: networking module and collision temporarily not included
+# on linux you have to have your freetype include directory in
+# /usr/inc/freetype2 or change it in line 26 of this file
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+# FLAGS
+#------------------------------------------------------------------------------
+CC = gcc
+CPP = g++
+
+CFLAGS := -ffast-math -Wall
+
+ifeq ($(TARGET),win32)
+	ifdef STATICLIB
+		CCFLAGS += -DSTATICLIB
+	else
+		CCFLAGS += -DBUILD_DLL
+	endif
+	CCFLAGS += -s -c -Wall -I../inc -I../extern/win32/inc -DTARGET_WIN32 -mthreads
+	CFLAGS += -s -c -Wall -I../inc -I../extern/win32/inc -DTARGET_WIN32 -mthreads
+endif
+ifeq ($(TARGET),linux)
+	CCFLAGS += -s -c -Wall -I../inc -I/usr/include/freetype2/ -DTARGET_LINUX
+	CFLAGS += -s -c -Wall -I../inc -I/usr/include/freetype2/ -DTARGET_LINUX
+endif
+
+WRAPPERLIBNAME := libyaglwrapper
+LIBNAME := libyagl
+RELEASEDIR := release
+MEMLEAKDETECTOR :=
+
+ifdef MEMLEAK 
+	MEMLEAKDETECTOR := memoryleakdetector/debug_new.o
+endif
+
+ifdef DEBUG
+	CCFLAGS += -g -DDEBUG
+	CFLAGS += -g -DDEBUG	
+	WRAPPERLIBNAME := libyaglwrapperd
+	LIBNAME := libyagld
+	RELEASEDIR := debug
+endif
+
+ifdef OPTIMIZE
+	CCFLAGS += -O2	
+endif
+
+#------------------------------------------------------------------------------
+# DEPENDANCIES
+#------------------------------------------------------------------------------
+
+Yaglobjects := obj/yagl.o
+Yaglheaders := ../inc/yagl.h
+
+yaglwrapperobjects := obj/yaglwrapper/yaglwrapper.o
+yaglwrapperheaders := ../inc/yaglwrapper.h
+
+logobjects := obj/log/log.o
+logheaders := ../inc/log/log.h
+
+timerobjects := obj/timer/timer.o
+timerheaders := ../inc/timer/timer.h
+
+stringobjects := obj/string/string.o
+stringheaders := ../inc/string/string.h
+
+inputobjects := $(patsubst input/%.cpp,obj/input/%.o,$(wildcard input/*.cpp))
+inputheaders := $(wildcard ../inc/input/*.h)
+
+gfxobjects := $(patsubst gfx/%.cpp,obj/gfx/%.o,$(wildcard gfx/*.cpp))
+gfxheaders := $(wildcard ../inc/gfx/*.h)
+
+audiolibobjects := $(patsubst audiolib/%.cpp,obj/audiolib/%.o,$(wildcard audiolib/*.cpp))
+audiolibheaders := $(wildcard ../inc/audiolib/*.h)
+
+decoderobjects := $(patsubst decoder/%.cpp,obj/decoder/%.o,$(wildcard decoder/*.cpp))
+decoderheaders := $(wildcard ../inc/decoder/*.h)
+
+netlibobjects := $(patsubst netlib/%.cpp,obj/netlib/%.o,$(wildcard netlib/*.cpp))
+netlibheaders := $(wildcard ../inc/netlib/*.h)
+
+threadlibobjects := $(patsubst threadlib/%.cpp,obj/threadlib/%.o,$(wildcard threadlib/*.cpp))
+threadlibheaders := $(wildcard ../inc/threadlib/*.h)
+
+#collisionlibobjects := $(patsubst collisionlib/%.cpp,obj/collisionlib/%.o,$(wildcard collisionlib/*.cpp))
+#collisionlibheaders := $(wildcard ../inc/collisionlib/*.h)
+
+
+#------------------------------------------------------------------------------
+# BUILDING AND PACKAGING
+#------------------------------------------------------------------------------		
+all: gfxlib audiolib input decoder log timer string threadlib netlib leakdetector Yagl Yaglwrapper
+
+ifeq ($(TARGET),win32)
+packfb: 		
+	mkdir ../distris/win32/mingw/yaglfbtmp
+	mkdir ../distris/win32/mingw/yaglfbtmp/bin
+	mkdir ../distris/win32/mingw/yaglfbtmp/doc
+	mkdir ../distris/win32/mingw/yaglfbtmp/doc/licenses
+	mkdir ../distris/win32/mingw/yaglfbtmp/inc
+	mkdir ../distris/win32/mingw/yaglfbtmp/lib		
+	mkdir ../distris/win32/mingw/yaglfbtmp/samples	
+	cp ../bin/mingw/*.dll ../distris/win32/mingw/yaglfbtmp/bin
+	cp ../inc/yaglwrapper.bi ../distris/win32/mingw/yaglfbtmp/inc/yaglwrapper.bi
+	cp ../doc/userguide/yagldoc.pdf ../distris/win32/mingw/yaglfbtmp/doc/ 
+	cp ../doc/licenses/*.txt ../distris/win32/mingw/yaglfbtmp/doc/licenses/ 		
+	cp ../lib/win32/mingw/release/libyaglwrapper.a ../distris/win32/mingw/yaglfbtmp/lib
+	cp -ru ../distris/win32/mingw/yaglfbtmp ./
+	find yaglfbtmp | grep svn | xargs rm -rf
+	tar cvf - yaglfbtmp | gzip > yaglfb-win32.tar.gz
+	mv yaglfb-win32.tar.gz ../distris/win32/mingw
+	rm -rf yaglfbtmp
+	rm -rf ../distris/win32/mingw/yaglfbtmp
+
+
+packc: 			
+	mkdir ../distris/win32/mingw/yaglctmp
+	mkdir ../distris/win32/mingw/yaglctmp/bin
+	mkdir ../distris/win32/mingw/yaglctmp/doc
+	mkdir ../distris/win32/mingw/yaglctmp/doc/licenses
+	mkdir ../distris/win32/mingw/yaglctmp/inc
+	mkdir ../distris/win32/mingw/yaglctmp/lib		
+	mkdir ../distris/win32/mingw/yaglctmp/samples	
+	cp ../bin/mingw/*.dll ../distris/win32/mingw/yaglctmp/bin	
+	cp ../inc/yaglwrapper.h ../distris/win32/mingw/yaglctmp/inc
+	cp ../doc/userguide/yagldoc.pdf ../distris/win32/mingw/yaglctmp/doc/
+	cp ../doc/licenses/*.txt ../distris/win32/mingw/yaglctmp/doc/licenses/			
+	cp ../lib/win32/mingw/release/libyaglwrapper.a ../distris/win32/mingw/yaglctmp/lib
+	cp -ru ../distris/win32/mingw/yaglctmp ./
+	find yaglctmp | grep svn | xargs rm -rf
+	tar cvf - yaglctmp | gzip > yaglc-win32-mingw.tar.gz
+	mv yaglc-win32-mingw.tar.gz ../distris/win32/mingw
+	rm -rf yaglctmp
+	rm -rf ../distris/win32/mingw/yaglctmp	
+
+ifdef STATICLIB
+Yaglwrapper: $(yaglwrapperobjects)
+	rm -f ../lib/$(TARGET)/mingw/release/$(WRAPPERLIBNAME)_static.a	
+	ar x ../lib/win32/mingw/$(RELEASEDIR)/$(LIBNAME)_static.a
+	ar x ../lib/win32/mingw/$(RELEASEDIR)/libstdc++.a	
+	ar x ../lib/win32/mingw/$(RELEASEDIR)/libc++util.a
+	ar x ../lib/win32/mingw/$(RELEASEDIR)/libmingwex.a	
+	mv *.o obj/yaglwrapper
+	ar -rc ../lib/$(TARGET)/mingw/$(RELEASEDIR)/$(WRAPPERLIBNAME)_static.a obj/yaglwrapper/*.o
+	ranlib ../lib/$(TARGET)/mingw/$(RELEASEDIR)/$(WRAPPERLIBNAME)_static.a
+	
+Yagl: $(Yaglobjects) $(MEMLEAKDETECTOR)			
+	rm -f ../bin/mingw/$(LIBNAME).dll		
+	rm -f ../lib/$(TARGET)/mingw/$(RELEASEDIR)/$(LIBNAME).a
+	ar x ../extern/win32/lib/libglfw.a
+	ar x ../extern/win32/lib/libfreetype.a
+	ar x ../extern/win32/lib/libogg.a
+	ar x ../extern/win32/lib/libsndfile.a
+	ar x ../extern/win32/lib/libvorbis.a
+	ar x ../extern/win32/lib/libvorbisfile.a	
+	ar x ../extern/win32/lib/libpng.a
+	ar x ../extern/win32/lib/libopenal32.a
+	mv *.o obj/
+	ar -rc ../lib/win32/mingw/$(RELEASEDIR)/$(LIBNAME)_static.a obj/netlib/*.o obj/threadlib/*.o obj/gfx/*.o  obj/audiolib/*.o obj/input/*.o obj/decoder/*.o obj/log/*.o obj/timer/*.o obj/string/*.o $(MEMLEAKDETECTOR) obj/*.o 
+	ranlib ../lib/win32/mingw/$(RELEASEDIR)/$(LIBNAME)_static.a
+	
+else
+Yaglwrapper: $(yaglwrapperobjects)
+	rm -f ../lib/$(TARGET)/mingw/$(RELEASEDIR)/$(WRAPPERLIBNAME).a
+	ar x ../lib/win32/mingw/$(RELEASEDIR)/$(LIBNAME).a
+	ar x ../lib/win32/mingw/$(RELEASEDIR)/libstdc++.a	
+	ar x ../lib/win32/mingw/$(RELEASEDIR)/libc++util.a
+	ar x ../lib/win32/mingw/$(RELEASEDIR)/libmingwex.a
+	mv *.o obj/yaglwrapper
+	ar -rc ../lib/$(TARGET)/mingw/$(RELEASEDIR)/$(WRAPPERLIBNAME).a obj/yaglwrapper/*.o
+	ranlib ../lib/$(TARGET)/mingw/$(RELEASEDIR)/$(WRAPPERLIBNAME).a
+
+Yagl: $(Yaglobjects) $(MEMLEAKDETECTOR)			
+	rm -f ../bin/mingw/$(LIBNAME).dll		
+	rm -f ../lib/$(TARGET)/mingw/$(RELEASEDIR)/$(LIBNAME).a
+	g++ -shared $(CPPFLAGS) -B../extern/win32/lib obj/netlib/*.o obj/threadlib/*.o obj/gfx/*.o  obj/audiolib/*.o obj/input/*.o obj/decoder/*.o obj/log/*.o obj/timer/*.o obj/string/*.o obj/*.o $(MEMLEAKDETECTOR) -o ../bin/mingw/$(LIBNAME).dll -lglfw -lopenal32 -lfreetype -lopengl32 -lvorbisfile -lvorbis -logg -lsndfile -lpng -lz -lwinmm -lws2_32 -lglu32
+	dlltool -l ../lib/win32/mingw/$(RELEASEDIR)/$(LIBNAME).a -z ../lib/win32/mingw/$(RELEASEDIR)/$(LIBNAME).def -D $(LIBNAME).dll obj/*.o obj/netlib/*.o obj/threadlib/*.o obj/gfx/*.o obj/audiolib/*.o obj/input/*.o obj/decoder/*.o obj/log/*.o obj/timer/*.o obj/string/*.o $(MEMLEAKDETECTOR)
+endif
+endif
+
+ifeq ($(TARGET),linux)
+
+packfb: 	
+	find ../distris/linux -name yaglfbtmp -exec rm -rf ../distris/linux/yaglfbtmp ';'
+	mkdir ../distris/linux/yaglfbtmp
+	mkdir ../distris/linux/yaglfbtmp/doc
+	mkdir ../distris/linux/yaglfbtmp/doc/licenses
+	mkdir ../distris/linux/yaglfbtmp/inc
+	mkdir ../distris/linux/yaglfbtmp/lib		
+	mkdir ../distris/linux/yaglfbtmp/samples
+	mkdir ../distris/linux/yaglfbtmp/src	
+	cp ../inc/yaglwrapperlinux.bi ../distris/linux/yaglfbtmp/inc/yaglwrapper.bi
+	cp ../doc/userguide/yagldoc.pdf ../distris/linux/yaglfbtmp/doc/ 
+	cp ../doc/licenses/*.txt ../distris/linux/yaglfbtmp/doc/licenses/ 
+	cp -ru * ../distris/linux/yaglfbtmp/src
+	find ../distris/linux/yaglfbtmp/src -name *.o -delete
+	cp -ru ../inc/* ../distris/linux/yaglfbtmp/inc/
+	cp -f ../distris/linux/makefilefb ../distris/linux/yaglfbtmp/src/makefile	
+	cp -f ../distris/linux/testlibs ../distris/linux/yaglfbtmp/src/	
+	cp -ru ../distris/linux/yaglfbtmp ./
+	find yaglfbtmp | grep svn | xargs rm -rf
+	tar cvf - yaglfbtmp | gzip > yaglfb-linux.tar.gz
+	mv yaglfb-linux.tar.gz ../distris/linux
+	rm -rf yaglfbtmp
+	rm -rf ../distris/linux/yaglfbtmp
+
+
+packc: 		
+	find ../distris/linux/ -ignore_readdir_race -name yaglctmp -exec rm -rf ../distris/linux/yaglctmp ';'
+	mkdir ../distris/linux/yaglctmp
+	mkdir ../distris/linux/yaglctmp/doc
+	mkdir ../distris/linux/yaglctmp/doc/licenses
+	mkdir ../distris/linux/yaglctmp/inc
+	mkdir ../distris/linux/yaglctmp/lib		
+	mkdir ../distris/linux/yaglctmp/samples
+	mkdir ../distris/linux/yaglctmp/src	
+	cp ../inc/yaglwrapper.h ../distris/linux/yaglctmp/inc
+	cp ../doc/userguide/yagldoc.pdf ../distris/linux/yaglctmp/doc/
+	cp ../doc/licenses/*.txt ../distris/linux/yaglctmp/doc/licenses/	
+	cp -ru * ../distris/linux/yaglctmp/src
+	find ../distris/linux/yaglctmp/src -name *.o -delete
+	cp -ru ../inc/* ../distris/linux/yaglctmp/inc/
+	find ../distris/linux/yaglctmp/inc -name *.bi -delete
+	cp -f ../distris/linux/makefilec ../distris/linux/yaglctmp/src/makefile	
+	cp -f ../distris/linux/testlibs ../distris/linux/yaglctmp/src/	
+	cp -ru ../distris/linux/yaglctmp ./
+	find yaglctmp | grep svn | xargs rm -rf
+	tar cvf - yaglctmp | gzip > yaglc-linux.tar.gz
+	mv yaglc-linux.tar.gz ../distris/linux
+	rm -rf yaglctmp
+	rm -rf ../distris/linux/yaglctmp
+
+Yaglwrapper: $(yaglwrapperobjects)
+	ar x ../lib/linux/$(RELEASEDIR)/$(LIBNAME).a
+	cp *.o obj/yaglwrapper
+	ar -rc ../lib/$(TARGET)/$(RELEASEDIR)/$(WRAPPERLIBNAME).a obj/yaglwrapper/*.o
+	ranlib ../lib/$(TARGET)/$(RELEASEDIR)/$(WRAPPERLIBNAME).a
+	rm *.o
+	
+Yagl: $(Yaglobjects)
+	rm -f ../lib/$(TARGET)/$(RELEASEDIR)/$(LIBNAME).a
+	ar -rc ../lib/$(TARGET)/$(RELEASEDIR)/$(LIBNAME).a obj/*.o obj/netlib/*.o obj/threadlib/*.o obj/gfx/*.o obj/*.o obj/audiolib/*.o obj/input/*.o obj/decoder/*.o obj/log/*.o obj/timer/*.o obj/string/*.o $(MEMLEAKDETECTOR)
+	ranlib ../lib/$(TARGET)/$(RELEASEDIR)/$(LIBNAME).a
+	
+endif
+
+#------------------------------------------------------------------------------
+# RULES for the seperate modules
+#------------------------------------------------------------------------------
+
+leakdetector: memoryleakdetector/debug_new.cpp
+	$(CPP) $(CCFLAGS)  -DDEBUG memoryleakdetector/debug_new.cpp -c -o memoryleakdetector/debug_new.o
+
+netlib: $(netlibobjects) $(threadlibobjects)
+
+gfxlib: $(gfxobjects)
+
+audiolib: $(audiolibobjects)
+
+input: $(inputobjects)
+
+decoder: $(decoderobjects)
+
+log: $(logobjects)
+
+timer: $(timerobjects)
+	
+string: $(stringobjects)
+
+threadlib: $(threadlibobjects)
+
+#collision: $(collisionlibobjects)
+	
+memoryleakdetector/%.o : %.cpp
+	$(CPP) $(CCFLAGS) $< -o $@
+	
+obj/%.o : %.cpp $(Yaglheaders)
+	$(CPP) $(CCFLAGS) $< -o $@
+	
+obj/yaglwrapper/%.o : %.c $(yaglwrapperheaders)
+	$(CPP) $(CFLAGS) $< -o $@
+	
+obj/gfx/%.o : gfx/%.cpp $(gfxheaders)
+	$(CPP) $(CCFLAGS) $< -o $@
+
+obj/audiolib/%.o : audiolib/%.cpp $(audiolibheaders)
+	$(CPP) $(CCFLAGS) $< -o $@
+	
+obj/decoder/%.o : decoder/%.cpp $(decoderheaders)
+	$(CPP) $(CCFLAGS) $< -o $@
+	
+obj/netlib/%.o : netlib/%.cpp $(netlibheaders)
+	$(CPP) $(CCFLAGS) $< -o $@
+	
+obj/threadlib/%.o : threadlib/%.cpp $(threadlibheaders)
+	$(CPP) $(CCFLAGS) $< -o $@
+
+obj/input/%.o : input/%.cpp $(inputheaders)
+	$(CPP) $(CCFLAGS) $< -o $@
+	
+obj/log/%.o : log/%.cpp $(logheaders)
+	$(CPP) $(CCFLAGS) $< -o $@
+	
+obj/timer/%.o : timer/%.cpp $(timerheaders)
+	$(CPP) $(CCFLAGS) $< -o $@
+	
+obj/string/%.o : string/%.cpp $(stringheaders)
+	$(CPP) $(CCFLAGS) $< -o $@
+	
+#obj/collisionlib/%.0 : collisionlib/%.cpp $(collisionlibheaders)
+#	$(CPP) $(CCFLAGS) $< -o $@
+
+#------------------------------------------------------------------------------
+# CLEANING OUT
+# Note: this will not clean up the .a files !!! they get deleted
+# when the Yagl rule is executed
+#------------------------------------------------------------------------------
+clean:
+	rm -f  obj/gfx/*.o
+	rm -f  obj/netlib/*.o
+	rm -f  obj/threadlib/*.o
+	rm -f  obj/audiolib/*.o
+	rm -f  obj/input/*.o
+	rm -f  obj/decoder/*.o
+	rm -f  obj/log/*.o
+	rm -f  obj/string/*.o
+	rm -f  obj/timer/*.o
+#	rm -f  obj/collisionlib/*.o
+	rm -f  obj/yaglwrapper/*.o
+	rm -f  obj/*.o	
