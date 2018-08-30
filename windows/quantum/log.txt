@@ -1,0 +1,149 @@
+[FileManager] path to quantum is '', returning file 'config.dat'
+[SoundManager] buffers size: 16384
+[Texture] created texture 512x512
+[Renderer] shaders supported
+[Texture] created texture 128x128
+[Renderer] loaded textures
+[Texture] created texture 512x128
+[StartMenu] Texture count: 3
+[StartMenu] FBO count: 3
+[Renderer] created offscreen fbo
+[Texture] disposed texture 512.0x128.0
+[Texture] disposed texture 128.0x128.0
+[Renderer] disposed
+[FileManager] path to quantum is '', returning file 'tmp463914291950606.rec'
+[GameSaver] opened file 'tmp463914291950606.rec' for output
+[GameLoop] couldn't create recorder: null
+quantum.utils.Log.getStackTrace(Log.java:74)
+quantum.game.GameLoop.<init>(GameLoop.java:62)
+quantum.forms.Tutorial.<init>(Tutorial.java:53)
+quantum.forms.StartMenu$2.clicked(StartMenu.java:125)
+quantum.gui.Button.mouseReleased(Button.java:79)
+quantum.gui.Container.mouseReleased(Container.java:115)
+quantum.gui.Container.mouseReleased(Container.java:115)
+quantum.gui.Gui$4.run(Gui.java:197)
+quantum.gui.Gui.render(Gui.java:109)
+quantum.Quantum.display(Quantum.java:230)
+jogamp.opengl.GLDrawableHelper.displayImpl(GLDrawableHelper.java:588)
+jogamp.opengl.GLDrawableHelper.display(GLDrawableHelper.java:572)
+javax.media.opengl.awt.GLCanvas$7.run(GLCanvas.java:1054)
+jogamp.opengl.GLDrawableHelper.invokeGLImpl(GLDrawableHelper.java:1034)
+jogamp.opengl.GLDrawableHelper.invokeGL(GLDrawableHelper.java:909)
+javax.media.opengl.awt.GLCanvas$8.run(GLCanvas.java:1065)
+java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:301)
+java.awt.EventQueue.dispatchEventImpl(EventQueue.java:758)
+java.awt.EventQueue.access$500(EventQueue.java:97)
+java.awt.EventQueue$3.run(EventQueue.java:709)
+java.awt.EventQueue$3.run(EventQueue.java:703)
+java.security.AccessController.doPrivileged(Native Method)
+java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:80)
+java.awt.EventQueue.dispatchEvent(EventQueue.java:728)
+java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:205)
+java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+
+[Renderer] shaders supported
+[Texture] created texture 128x128
+[Renderer] loaded textures
+[Renderer] created offscreen fbo
+[Texture] created texture 32x32
+[Texture] created texture 512x512
+[Texture] created texture 32x32
+[Texture] disposed texture 128.0x128.0
+[Renderer] disposed
+[Texture] disposed texture 512.0x512.0
+[Texture] disposed texture 32.0x32.0
+[Texture] disposed texture 32.0x32.0
+[Renderer] shaders supported
+[Texture] created texture 128x128
+[Renderer] loaded textures
+[Texture] created texture 512x128
+[StartMenu] Texture count: 3
+[StartMenu] FBO count: 3
+[Renderer] created offscreen fbo
+[Texture] disposed texture 512.0x128.0
+[Texture] disposed texture 128.0x128.0
+[Renderer] disposed
+[Renderer] shaders supported
+[Texture] created texture 128x128
+[Renderer] loaded textures
+[Texture] created texture 512x128
+[FileManager] path to quantum is '', returning file 'dat/scripts/'
+[SinglePlayerMenu] listing bots files in 'dat/scripts/
+[FileManager] path to quantum is '', returning file 'dat/maps/'
+[Texture] created texture 256x256
+[Texture] disposed texture 256.0x256.0
+[Texture] created texture 256x256
+[Texture] disposed texture 256.0x256.0
+[Texture] created texture 256x256
+[Texture] disposed texture 256.0x256.0
+[Texture] created texture 256x256
+[Texture] disposed texture 256.0x256.0
+[Texture] created texture 256x256
+[Texture] disposed texture 256.0x256.0
+[Texture] created texture 256x256
+[Texture] disposed texture 256.0x256.0
+[Texture] created texture 256x256
+[Texture] disposed texture 128.0x128.0
+[Renderer] disposed
+[Texture] disposed texture 512.0x128.0
+[Texture] disposed texture 256.0x256.0
+[FileManager] path to quantum is '', returning file 'tmp463949845587628.rec'
+[GameSaver] opened file 'tmp463949845587628.rec' for output
+[FileManager] path to quantum is '', returning file 'tmp463949845587628.rec'
+[Renderer] shaders supported
+[Texture] created texture 128x128
+[Renderer] loaded textures
+[Renderer] created offscreen fbo
+[Texture] created texture 32x32
+[Texture] created texture 512x512
+[Texture] created texture 32x32
+[Texture] disposed texture 128.0x128.0
+[Renderer] disposed
+[Texture] disposed texture 512.0x512.0
+[Texture] disposed texture 32.0x32.0
+[Texture] disposed texture 32.0x32.0
+[FileManager] path to quantum is '', returning file 'tmp463949845587628.rec'
+[Renderer] shaders supported
+[Texture] created texture 128x128
+[Renderer] loaded textures
+[Texture] created texture 512x128
+[FileManager] path to quantum is '', returning file 'dat/scripts/'
+[SinglePlayerMenu] listing bots files in 'dat/scripts/
+[FileManager] path to quantum is '', returning file 'dat/maps/'
+[Texture] created texture 256x256
+[Texture] disposed texture 256.0x256.0
+[Texture] created texture 256x256
+[Texture] disposed texture 128.0x128.0
+[Renderer] disposed
+[Texture] disposed texture 512.0x128.0
+[Texture] disposed texture 256.0x256.0
+[Renderer] shaders supported
+[Texture] created texture 128x128
+[Renderer] loaded textures
+[Texture] created texture 512x128
+[StartMenu] Texture count: 3
+[StartMenu] FBO count: 3
+[Renderer] created offscreen fbo
+[Texture] disposed texture 512.0x128.0
+[Texture] disposed texture 128.0x128.0
+[Renderer] disposed
+[FileManager] path to quantum is '', returning file 'dat/maps'
+[Renderer] shaders supported
+[Texture] created texture 128x128
+[Renderer] loaded textures
+[Renderer] created offscreen fbo
+[Texture] disposed texture 128.0x128.0
+[Renderer] disposed
+[Renderer] shaders supported
+[Texture] created texture 128x128
+[Renderer] loaded textures
+[Texture] created texture 512x128
+[StartMenu] Texture count: 3
+[StartMenu] FBO count: 3
+[Renderer] created offscreen fbo
+[FileManager] path to quantum is '', returning file './'
+[FileManager] path to quantum is '', returning file 'tmp463914291950606.rec'
