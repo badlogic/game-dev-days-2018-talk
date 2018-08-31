@@ -1,8 +1,16 @@
+"scene"
+6
+"scenes\intro1.bmp"
+"scenes\eich1.pcx"
+"scenes\intro2.bmp"
+"scenes\schiff.bmp"
+"scenes\intro3.bmp"
+"scenes\capteich.bmp"
 "level"
 "levels\lvl1-1"
 "loads\tex3"
 2
-310
+270
 "level"
 "levels\lvl1-2"
 "loads\tex3"
@@ -126,4 +134,3 @@
 "scenes\intro4.bmp"
 "scenes\credits.bmp"
 "end"
-
