@@ -201,7 +201,7 @@ DO
       frameCounter = 0
       frameStartTime = TIMER
    END IF
-   ' DoENEMS
+   DoENEMS
    DoDOORS
    TranslateFLOOR
    'slIndex% = 0
@@ -209,11 +209,11 @@ DO
    TranslateWALL
    'slIndex% = 0
    RenderWALL
-   ' RenderWEAP
+   RenderWEAP
    IF armor% < 0 THEN armor% = 0
    IF health% < 0 THEN health% = 0
    IF health% = 0 THEN dead
-   ' RenderSTAT
+   RenderSTAT
    DoINPUT
    ' DQBline 1, 155, 100, 159, 100, 14
    ' DQBline 1, 161, 100, 165, 100, 14
@@ -1243,18 +1243,18 @@ END IF
 END SUB
 
 SUB RenderFLOOR
-dim z1 as INTEGER
-dim z2 as INTEGER
-dim z3 as INTEGER
-dim z4 as INTEGER
-dim x1 as LONG
-dim x2 as LONG
-dim x3 as LONG
-dim x4 as LONG
-dim y1 as LONG
-dim y2 as LONG
-dim y3 as LONG
-dim y4 as LONG
+DIM z1 AS INTEGER
+DIM z2 AS INTEGER
+DIM z3 AS INTEGER
+DIM z4 AS INTEGER
+DIM x1 AS LONG
+DIM x2 AS LONG
+DIM x3 AS LONG
+DIM x4 AS LONG
+DIM y1 AS LONG
+DIM y2 AS LONG
+DIM y3 AS LONG
+DIM y4 AS LONG
 
    FOR index = slIndex% - 1 TO 0 STEP -1
       i = slist(index).i
@@ -1283,72 +1283,17 @@ dim y4 as LONG
       y4 = 100 - (rpoly(i).y4 * DISTtoPLANE2&) \ z4
 
       IF IsOnScreen(x1, y1, x2, y2, x3, y3) THEN
-         'DQBttri 1, x1, y1, x2, y2, x3, y3, 0, 0, 0, 63, 63, 63, VARSEG(tex(0)), VARPTR(tex(WALLtexBYTE * floor(i).texnum))
+         DQBttri 1, x1, y1, x2, y2, x3, y3, 0, 0, 0, 63, 63, 63, VARSEG(tex(0)), VARPTR(tex(WALLtexBYTE * floor(i).texnum))
          floorTriangles = floorTriangles + 1
       END IF
       IF IsOnScreen(x1, y1, x4, y4, x3, y3) THEN
-         'DQBttri 1, x1, y1, x4, y4, x3, y3, 0, 0, 63, 0, 63, 63, VARSEG(tex(0)), VARPTR(tex(WALLtexBYTE * floor(i).texnum))
+         DQBttri 1, x1, y1, x4, y4, x3, y3, 0, 0, 63, 0, 63, 63, VARSEG(tex(0)), VARPTR(tex(WALLtexBYTE * floor(i).texnum))
          floorTriangles = floorTriangles + 1
       END IF
 
 skip:
    NEXT index
 endRenderFloor:
-   slIndex% = 0
-END SUB
-
-SUB RenderWALL
-dim z1 as INTEGER
-dim z2 as INTEGER
-dim z3 as INTEGER
-dim z4 as INTEGER
-dim x1 as LONG
-dim x2 as LONG
-dim x3 as LONG
-dim x4 as LONG
-dim y1 as LONG
-dim y2 as LONG
-dim y3 as LONG
-dim y4 as LONG
-dim i as INTEGER
-
-   FOR index = slIndex% - 1 TO 0 STEP -1
-      i = slist(index).i
-      IF i < 0 THEN GOTO skip2
-      IF wall(i).p = 2 OR wall(i).p = 3 OR wall(i).p = 4 THEN CALL RenderITEM(i, 64, 64): GOTO skip2
-      IF wall(i).p > 4 THEN CALL RenderENEM(i): GOTO skip2
-
-      z1 = rpoly(i).z1
-      z2 = rpoly(i).z2
-      z3 = rpoly(i).z3
-      z4 = rpoly(i).z4
-
-      IF z1 <= 0 THEN z1 = 1
-      IF z2 <= 0 THEN z2 = 1
-      IF z3 <= 0 THEN z3 = 1
-      IF z4 <= 0 THEN z4 = 1
-
-      x1 = 160 + (rpoly(i).x1 * DISTtoPLANE1&) \ z1
-      x2 = 160 + (rpoly(i).x2 * DISTtoPLANE1&) \ z2
-      x3 = 160 + (rpoly(i).x3 * DISTtoPLANE1&) \ z3
-      x4 = 160 + (rpoly(i).x4 * DISTtoPLANE1&) \ z4
-
-      y1 = 100 - (rpoly(i).y1 * DISTtoPLANE2&) \ z1
-      y2 = 100 - (rpoly(i).y2 * DISTtoPLANE2&) \ z2
-      y3 = 100 - (rpoly(i).y3 * DISTtoPLANE2&) \ z3
-      y4 = 100 - (rpoly(i).y4 * DISTtoPLANE2&) \ z4
-
-      IF IsOnScreen(x1, y1, x2, y2, x3, y3) THEN
-         'DQBttri 1, x1, y1, x2, y2, x3, y3, 0, 0, 0, 63, 63, 63, VARSEG(tex(0)), VARPTR(tex(WALLtexBYTE * wall(i).texnum))
-         wallTriangles = wallTriangles + 1
-      END IF
-      IF IsOnScreen(x1, y1, x4, y4, x3, y3) THEN
-         'DQBttri 1, x1, y1, x4, y4, x3, y3, 0, 0, 63, 0, 63, 63, VARSEG(tex(0)), VARPTR(tex(WALLtexBYTE * wall(i).texnum))
-         wallTriangles = wallTriangles + 1
-      END IF
-
-skip2:
-   NEXT index
    slIndex% = 0
 END SUB
 
@@ -1389,6 +1334,61 @@ ELSE
    save$ = ""
 END IF
 
+END SUB
+
+SUB RenderWALL
+DIM z1 AS INTEGER
+DIM z2 AS INTEGER
+DIM z3 AS INTEGER
+DIM z4 AS INTEGER
+DIM x1 AS LONG
+DIM x2 AS LONG
+DIM x3 AS LONG
+DIM x4 AS LONG
+DIM y1 AS LONG
+DIM y2 AS LONG
+DIM y3 AS LONG
+DIM y4 AS LONG
+DIM i AS INTEGER
+
+   FOR index = slIndex% - 1 TO 0 STEP -1
+      i = slist(index).i
+      IF i < 0 THEN GOTO skip2
+      IF wall(i).p = 2 OR wall(i).p = 3 OR wall(i).p = 4 THEN CALL RenderITEM(i, 64, 64): GOTO skip2
+      IF wall(i).p > 4 THEN CALL RenderENEM(i): GOTO skip2
+
+      z1 = rpoly(i).z1
+      z2 = rpoly(i).z2
+      z3 = rpoly(i).z3
+      z4 = rpoly(i).z4
+
+      IF z1 <= 0 THEN z1 = 1
+      IF z2 <= 0 THEN z2 = 1
+      IF z3 <= 0 THEN z3 = 1
+      IF z4 <= 0 THEN z4 = 1
+
+      x1 = 160 + (rpoly(i).x1 * DISTtoPLANE1&) \ z1
+      x2 = 160 + (rpoly(i).x2 * DISTtoPLANE1&) \ z2
+      x3 = 160 + (rpoly(i).x3 * DISTtoPLANE1&) \ z3
+      x4 = 160 + (rpoly(i).x4 * DISTtoPLANE1&) \ z4
+
+      y1 = 100 - (rpoly(i).y1 * DISTtoPLANE2&) \ z1
+      y2 = 100 - (rpoly(i).y2 * DISTtoPLANE2&) \ z2
+      y3 = 100 - (rpoly(i).y3 * DISTtoPLANE2&) \ z3
+      y4 = 100 - (rpoly(i).y4 * DISTtoPLANE2&) \ z4
+
+      IF IsOnScreen(x1, y1, x2, y2, x3, y3) THEN
+         DQBttri 1, x1, y1, x2, y2, x3, y3, 0, 0, 0, 63, 63, 63, VARSEG(tex(0)), VARPTR(tex(WALLtexBYTE * wall(i).texnum))
+         wallTriangles = wallTriangles + 1
+      END IF
+      IF IsOnScreen(x1, y1, x4, y4, x3, y3) THEN
+         DQBttri 1, x1, y1, x4, y4, x3, y3, 0, 0, 63, 0, 63, 63, VARSEG(tex(0)), VARPTR(tex(WALLtexBYTE * wall(i).texnum))
+         wallTriangles = wallTriangles + 1
+      END IF
+
+skip2:
+   NEXT index
+   slIndex% = 0
 END SUB
 
 SUB RenderWEAP
